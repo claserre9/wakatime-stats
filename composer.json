@@ -1,0 +1,23 @@
+{
+    "name": "talma/wakatime-stats",
+    "description": "Publish your wakatime stats into a github readme file",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Claserre9\\WakatimeStats\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Clifford Laserre",
+            "email": "claserre9@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "guzzlehttp/guzzle": "^7.8",
+        "vlucas/phpdotenv": "^5.5",
+        "ext-json": "*",
+        "symfony/console": "^5.4"
+    }
+}
