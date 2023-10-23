@@ -83,8 +83,6 @@ $categories = [
     'operating_systems' => 'Operating Systems',
 ];
 
-$commonTable = new Table($output); // Create a common table style
-$commonTable->setStyle($tableStyle); // Set a common style for all tables
 
 foreach ($categories as $dataKey => $categoryTitle) {
     $table = new Table($output);
@@ -103,10 +101,11 @@ foreach ($categories as $dataKey => $categoryTitle) {
         if ($dataKey == 'languages' && $index === 4) break;
     }
 
-    $table->setColumnWidth(0, 15);
+    $table->setColumnWidth(0, 30);
     $table->setColumnWidth(1, 30);
 
     $table->render();
+    $output->writeln('');
     $output->writeln('');
 }
 
