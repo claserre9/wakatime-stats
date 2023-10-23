@@ -1,6 +1,6 @@
 <?php
 
-require  __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use Claserre9\WakatimeStats\GitHubStatsUpdater;
 use Claserre9\WakatimeStats\WakatimeDataFetcher;
@@ -12,7 +12,7 @@ use Symfony\Component\Console\Helper\TableStyle;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/../');
 $dotenv->safeLoad();
 
 $allowedTableStyle = ['default', 'box', 'compact', 'box-double', 'borderless'];
@@ -20,40 +20,40 @@ $allowedTableStyle = ['default', 'box', 'compact', 'box-double', 'borderless'];
 $wakatimeUserId = $_ENV['WAKATIME_USER_ID'] ?? $_SERVER['WAKATIME_USER_ID'] ?? $_SERVER['INPUT_WAKATIME_USER_ID'] ?? '';
 $wakatimeApiKey = $_ENV['WAKATIME_API_KEY'] ?? $_SERVER['WAKATIME_API_KEY'] ?? $_SERVER['INPUT_WAKATIME_API_KEY'] ?? '';
 $wakatimeRange = $_ENV['INPUT_WAKATIME_RANGE'] ?? 'all_time';
-$githubToken =  $_ENV['GH_TOKEN'] ?? $_SERVER['GH_TOKEN'] ?? $_SERVER['INPUT_GH_TOKEN'] ?? '';
+$githubToken = $_ENV['GH_TOKEN'] ?? $_SERVER['GH_TOKEN'] ?? $_SERVER['INPUT_GH_TOKEN'] ?? '';
 $tableStyle = $_ENV['TABLE_STYLE'] ?? $_SERVER['TABLE_STYLE'] ?? $_SERVER['INPUT_TABLE_STYLE'] ?? 'default';
 $wakatimeTimeRange = $_ENV['WAKATIME_TIME_RANGE'] ?? $_SERVER['WAKATIME_TIME_RANGE'] ?? $_SERVER['INPUT_WAKATIME_TIME_RANGE'] ?? 'all_time';
 
 
-if(!in_array(strtolower($tableStyle) , $allowedTableStyle)){
+if (!in_array(strtolower($tableStyle), $allowedTableStyle)) {
     $tableStyle = 'default';
 }
 
 
-if (!$wakatimeUserId || !$wakatimeApiKey){
+if (!$wakatimeUserId || !$wakatimeApiKey) {
     echo("Wakatime infos not provided");
     exit(1);
 }
-if (!$githubToken){
+if (!$githubToken) {
     echo("GitHub token not provided");
     exit(1);
 }
 
 $repositoryInfo = $_SERVER['GITHUB_REPOSITORY'] ?? $_ENV['GH_REPOSITORY'] ?? $_SERVER['INPUT_GITHUB_REPOSITORY'] ?? '';
 
-if (!$repositoryInfo){
+if (!$repositoryInfo) {
     echo("Repository info not provided");
     exit(1);
 }
 
 list($githubUsername, $githubRepositoryName) = explode('/', $repositoryInfo);
 
-if (!$githubUsername || !$githubRepositoryName){
+if (!$githubUsername || !$githubRepositoryName) {
     echo("Repository info is incomplete");
     exit(1);
 }
 
-if ($githubUsername !== $githubRepositoryName){
+if ($githubUsername !== $githubRepositoryName) {
     echo("Repository is not the special one required. Must have <username>/<username>");
     exit(1);
 }
@@ -67,12 +67,10 @@ try {
     if (!$wakatimeData['is_up_to_date']) {
         exit("Wakatime data is not up to date yet. Please wait a few minutes.");
     }
-
 } catch (GuzzleException $e) {
     echo $e->getMessage()."\n";
     exit(1);
 }
-
 
 
 $output = new BufferedOutput();
@@ -96,12 +94,19 @@ foreach ($categories as $dataKey => $categoryTitle) {
             new TableCell(
                 $stat["text"],
                 ['style' => new TableCellStyle(['align' => 'center'])]
-            )
+            ),
         ]);
-        if ($dataKey == 'languages' && $index === 4) break;
+
+        if ($dataKey == 'editors' && $stat["name"] === 'Unknown Editor') {
+            continue;
+        }
+
+        if ($dataKey == 'languages' && $index === 4) {
+            break;
+        }
     }
 
-    $table->setColumnWidth(0, 30);
+    $table->setColumnWidth(0, 20);
     $table->setColumnWidth(1, 30);
 
     $table->render();
@@ -110,7 +115,6 @@ foreach ($categories as $dataKey => $categoryTitle) {
 }
 
 $resultsStats = trim($output->fetch());
-
 
 
 $statsResult = "
