@@ -84,6 +84,7 @@ $categories = [
 
 foreach ($categories as $dataKey => $categoryTitle) {
     $table = new Table($output);
+    $table->setStyle($tableStyle);
     $stats = $wakatimeData[$dataKey];
     $table->setHeaderTitle("$readableRange Stats for $categoryTitle");
     $table->setHeaders([$categoryTitle, 'Total Hours']);
