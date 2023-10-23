@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/../');
 $dotenv->safeLoad();
 
-$allowedTableStyle = ['default', 'box', 'compact', 'box-double', 'borderless'];
+$allowedTableStyle = ['default', 'box', 'box-double'];
 
 $wakatimeUserId = $_ENV['WAKATIME_USER_ID'] ?? $_SERVER['WAKATIME_USER_ID'] ?? $_SERVER['INPUT_WAKATIME_USER_ID'] ?? '';
 $wakatimeApiKey = $_ENV['WAKATIME_API_KEY'] ?? $_SERVER['WAKATIME_API_KEY'] ?? $_SERVER['INPUT_WAKATIME_API_KEY'] ?? '';
