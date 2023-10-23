@@ -15,6 +15,17 @@ inputs:
   WAKATIME_USER_ID:
     description: "Your Wakatime User ID"
     required: true
+
+  WAKATIME_TIME_RANGE:
+    description: "Wakatime Time Range"
+    default: 'all_time'
+    required: false
+
+  TABLE_STYLE:
+    description: "Table Style"
+    default: 'default'
+    required: false
+
 runs:
   using: 'docker'
   image: 'Dockerfile'

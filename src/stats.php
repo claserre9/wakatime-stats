@@ -8,17 +8,26 @@ use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableCellStyle;
+use Symfony\Component\Console\Helper\TableStyle;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->safeLoad();
 
+$allowedTableStyle = ['default', 'box', 'compact', 'box-double', 'borderless'];
 
 $wakatimeUserId = $_ENV['WAKATIME_USER_ID'] ?? $_SERVER['WAKATIME_USER_ID'] ?? $_SERVER['INPUT_WAKATIME_USER_ID'] ?? '';
 $wakatimeApiKey = $_ENV['WAKATIME_API_KEY'] ?? $_SERVER['WAKATIME_API_KEY'] ?? $_SERVER['INPUT_WAKATIME_API_KEY'] ?? '';
 $wakatimeRange = $_ENV['INPUT_WAKATIME_RANGE'] ?? 'all_time';
 $githubToken =  $_ENV['GH_TOKEN'] ?? $_SERVER['GH_TOKEN'] ?? $_SERVER['INPUT_GH_TOKEN'] ?? '';
+$tableStyle = $_ENV['TABLE_STYLE'] ?? $_SERVER['TABLE_STYLE'] ?? $_SERVER['INPUT_TABLE_STYLE'] ?? 'default';
+$wakatimeTimeRange = $_ENV['WAKATIME_TIME_RANGE'] ?? $_SERVER['WAKATIME_TIME_RANGE'] ?? $_SERVER['INPUT_WAKATIME_TIME_RANGE'] ?? 'all_time';
+
+
+if(!in_array(strtolower($tableStyle) , $allowedTableStyle)){
+    $tableStyle = 'default';
+}
 
 
 if (!$wakatimeUserId || !$wakatimeApiKey){
@@ -52,7 +61,7 @@ if ($githubUsername !== $githubRepositoryName){
 
 $wakatimeDataFetcher = new WakatimeDataFetcher($wakatimeUserId, $wakatimeApiKey);
 try {
-    $wakatimeData = $wakatimeDataFetcher->fetchStats();
+    $wakatimeData = $wakatimeDataFetcher->fetchStats($wakatimeTimeRange);
     $readableRange = $wakatimeDataFetcher->getReadableRange();
 
     if (!$wakatimeData['is_up_to_date']) {
@@ -64,36 +73,48 @@ try {
     exit(1);
 }
 
+
+
 $output = new BufferedOutput();
+$tableStyle = new TableStyle();
 
+$categories = [
+    'languages' => 'Programming Languages',
+    'editors' => 'Editors',
+    'operating_systems' => 'Operating Systems',
+];
 
-$tableLanguages = new Table($output);
-$languagesStats = $wakatimeData['languages'];
-$tableLanguages->setHeaderTitle("$readableRange Stats (Top Five)");
-$tableLanguages->setHeaders(['Languages', 'Total Hours']);
-foreach ($languagesStats as $index => $languagesStat) {
-    $tableLanguages->addRow(
-        [
-            $languagesStat["name"],
+foreach ($categories as $dataKey => $categoryTitle) {
+    $table = new Table($output);
+    $stats = $wakatimeData[$dataKey];
+    $table->setHeaderTitle("$readableRange Stats for $categoryTitle");
+    $table->setHeaders([$categoryTitle, 'Total Hours']);
+
+    foreach ($stats as $index => $stat) {
+        $table->addRow([
+            $stat["name"],
             new TableCell(
-                $languagesStat["text"],
-                ['style' => new TableCellStyle(['align' => 'center',])]
+                $stat["text"],
+                ['style' => new TableCellStyle(['align' => 'center'])]
             )
         ]);
-    if ($index === 4) break;
+        if($dataKey == 'languages' && $index === 4) break;
+
+    }
+
+    $table->setColumnWidth(0, 15);
+    $table->setColumnWidth(1, 30);
+    $table->setStyle($tableStyle);
+    $table->render();
 }
 
-$tableLanguages->setColumnWidth(0, 15);
-$tableLanguages->setColumnWidth(1, 30);
-$tableLanguages->setStyle('box');
-$tableLanguages->render();
+$resultsStats = trim($output->fetch());
 
-$allTimeStats = trim($output->fetch());
 
 $statsResult = "
 ### Wakatime Stats
 ```
-{$allTimeStats}
+{$resultsStats}
 ```";
 
 
