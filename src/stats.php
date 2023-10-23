@@ -107,7 +107,7 @@ foreach ($categories as $dataKey => $categoryTitle) {
         }
     }
 
-    $table->setColumnWidth(0, 20);
+    $table->setColumnWidth(0, 25);
     $table->setColumnWidth(1, 30);
 
     $table->render();
