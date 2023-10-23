@@ -83,12 +83,8 @@ $categories = [
     'operating_systems' => 'Operating Systems',
 ];
 
-// Find the maximum number of rows among all categories
-$maxRows = 0;
-foreach ($categories as $dataKey => $categoryTitle) {
-    $stats = $wakatimeData[$dataKey];
-    $maxRows = max($maxRows, count($stats));
-}
+$commonTable = new Table($output); // Create a common table style
+$commonTable->setStyle($tableStyle); // Set a common style for all tables
 
 foreach ($categories as $dataKey => $categoryTitle) {
     $table = new Table($output);
@@ -104,19 +100,14 @@ foreach ($categories as $dataKey => $categoryTitle) {
                 ['style' => new TableCellStyle(['align' => 'center'])]
             )
         ]);
-    }
-
-    // Pad the table with empty rows if necessary
-    $rowCount = count($stats);
-    for ($i = $rowCount; $i < $maxRows; $i++) {
-        $table->addRow(['', '']);
+        if ($dataKey == 'languages' && $index === 4) break;
     }
 
     $table->setColumnWidth(0, 15);
     $table->setColumnWidth(1, 30);
-    $table->render();
 
-    $output->writeln(''); // Add a new line after rendering the table
+    $table->render();
+    $output->writeln('');
 }
 
 $resultsStats = trim($output->fetch());
