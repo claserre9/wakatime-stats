@@ -18,7 +18,6 @@ inputs:
 
   WAKATIME_TIME_RANGE:
     description: "Wakatime Time Range"
-    default: 'all_time'
     required: false
 
   TABLE_STYLE:
