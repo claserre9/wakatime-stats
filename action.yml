@@ -23,7 +23,6 @@ inputs:
 
   TABLE_STYLE:
     description: "Table Style"
-    default: 'default'
     required: false
 
 runs:
