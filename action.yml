@@ -18,10 +18,17 @@ inputs:
 
   WAKATIME_TIME_RANGE:
     description: "Wakatime Time Range"
+    default: 'all_time'
     required: false
 
   TABLE_STYLE:
     description: "Table Style"
+    default: 'default'
+    required: false
+
+  MAX_LANGUAGES:
+    description: "Maximum Languages"
+    default: '5'
     required: false
 
 runs:

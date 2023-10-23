@@ -22,8 +22,15 @@ $wakatimeApiKey = $_ENV['WAKATIME_API_KEY'] ?? $_SERVER['WAKATIME_API_KEY'] ?? $
 $wakatimeRange = $_ENV['INPUT_WAKATIME_RANGE'] ?? 'all_time';
 $githubToken = $_ENV['GH_TOKEN'] ?? $_SERVER['GH_TOKEN'] ?? $_SERVER['INPUT_GH_TOKEN'] ?? '';
 $tableStyle = $_ENV['TABLE_STYLE'] ?? $_SERVER['TABLE_STYLE'] ?? $_SERVER['INPUT_TABLE_STYLE'] ?? 'default';
+$maxLanguages = $_ENV['MAX_LANGUAGES'] ?? $_SERVER['MAX_LANGUAGES'] ?? $_SERVER['INPUT_MAX_LANGUAGES'] ?? '5';
 $wakatimeTimeRange = $_ENV['WAKATIME_TIME_RANGE'] ?? $_SERVER['WAKATIME_TIME_RANGE'] ?? $_SERVER['INPUT_WAKATIME_TIME_RANGE'] ?? 'all_time';
 
+if ($maxLanguages) {
+    $maxLanguages = (int)$maxLanguages;
+    if ($maxLanguages < 5) {
+        $maxLanguages = 5;
+    }
+}
 
 if (!in_array(strtolower($tableStyle), $allowedTableStyle)) {
     $tableStyle = 'default';
@@ -102,7 +109,7 @@ foreach ($categories as $dataKey => $categoryTitle) {
             ),
         ]);
 
-        if ($dataKey == 'languages' && $index === 4) {
+        if ($dataKey == 'languages' && $index === ($maxLanguages - 1)) {
             break;
         }
     }
