@@ -26,6 +26,9 @@ $maxLanguages = $_ENV['MAX_LANGUAGES'] ?? $_SERVER['MAX_LANGUAGES'] ?? $_SERVER[
 $wakatimeTimeRange = $_ENV['WAKATIME_TIME_RANGE'] ?? $_SERVER['WAKATIME_TIME_RANGE'] ?? $_SERVER['INPUT_WAKATIME_TIME_RANGE'] ?? 'all_time';
 
 if ($maxLanguages) {
+    if(!is_numeric($maxLanguages)) {
+        $maxLanguages = 5;
+    }
     $maxLanguages = (int)$maxLanguages;
     if ($maxLanguages < 5) {
         $maxLanguages = 5;
