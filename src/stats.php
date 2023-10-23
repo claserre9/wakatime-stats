@@ -108,7 +108,7 @@ foreach ($categories as $dataKey => $categoryTitle) {
             $stat["name"],
             new TableCell(
                 $stat["text"],
-                ['style' => new TableCellStyle(['align' => 'center'])]
+                ['style' => new TableCellStyle(['align' => $tableStyle == 'compact' ? 'left' : 'center'])]
             ),
         ]);
 
