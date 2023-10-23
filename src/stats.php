@@ -89,6 +89,10 @@ foreach ($categories as $dataKey => $categoryTitle) {
     $table->setHeaders([$categoryTitle, 'Total Hours']);
 
     foreach ($stats as $index => $stat) {
+        if ($dataKey == 'editors' && $stat["name"] == 'Unknown Editor') {
+            continue;
+        }
+
         $table->addRow([
             $stat["name"],
             new TableCell(
@@ -96,10 +100,6 @@ foreach ($categories as $dataKey => $categoryTitle) {
                 ['style' => new TableCellStyle(['align' => 'center'])]
             ),
         ]);
-
-        if ($dataKey == 'editors' && $stat["name"] === 'Unknown Editor') {
-            continue;
-        }
 
         if ($dataKey == 'languages' && $index === 4) {
             break;
