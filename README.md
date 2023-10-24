@@ -13,8 +13,6 @@ This GitHub Actions workflow is designed to update a README file with your Wakat
 
 Before you can use this workflow, you need to ensure you have the following:
 
-
-
 1. **Wakatime Account** :
    - [WakaTime](https://wakatime.com/) is a developer productivity tool and time tracking service specifically designed for software developers. 
    It helps developers keep track of how much time they spend working on various programming tasks, coding projects, 
@@ -49,7 +47,7 @@ To set up and use this GitHub Actions workflow in your repository, follow these 
    [//]: # (wakatime-stats)
    [//]: # (end-wakatime-stats)
    ```
-   The Wakatime will be between these two markdown comments
+   The Wakatime stats will appear between these two markdown comments
 
 3. **Configure Workflow** :
     - In the workflow file, specify the following input parameters:
