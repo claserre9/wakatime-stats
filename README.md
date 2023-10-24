@@ -62,7 +62,7 @@ To set up and use this GitHub Actions workflow in your repository, follow these 
       on:
         workflow_dispatch:
         schedule:
-          - cron: '0 0 * * *' #Will at midnight every day. Free to change according to your needs
+          - cron: '0 0 * * *' #Will run at midnight every day. Free to change according to your needs
  
       jobs:
         update-readme:
