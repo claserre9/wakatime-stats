@@ -90,6 +90,34 @@ To set up and use this GitHub Actions workflow in your repository, follow these 
     - The workflow will be triggered when you push changes to your repository's main branch, as per the example configuration. 
    You can customize the trigger events as needed.
 
+6. **Full Setup Example**
+   ```yaml
+    name: Wakatime Stats
+
+    on:
+    workflow_dispatch:
+    schedule:
+    - cron: '0 0 * * *'  # Run at midnight every day
+
+    jobs:
+    update-readme-with-wakatime-stats:
+    name: Update README with Wakatime stats
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: claserre9/wakatime-stats@v1
+        with:
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
+          WAKATIME_USER_ID: ${{ secrets.WAKATIME_USER_ID }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          TABLE_STYLE: 'default' # (optional) can be 'default','box' or 'box-double'
+          MAX_LANGUAGES: '5' # (optional) any number > 5, if under 5, this will be set to 5
+          WAKATIME_TIME_RANGE: 'all_time' # (optional) can be 'last_7_days', 'last_30_days', 'last_6_months' or 'last_year'
+   ```
+
 ## License
 
 This GitHub Actions workflow is provided under the [MIT License](https://opensource.org/license/mit/).
