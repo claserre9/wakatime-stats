@@ -8,138 +8,94 @@ use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableCellStyle;
-use Symfony\Component\Console\Helper\TableStyle;
 use Symfony\Component\Console\Output\BufferedOutput;
-
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/../');
 $dotenv->safeLoad();
 
-$allowedTableStyle = ['default', 'box', 'box-double'];
-
-$wakatimeUserId = $_ENV['WAKATIME_USER_ID'] ?? $_SERVER['WAKATIME_USER_ID'] ?? $_SERVER['INPUT_WAKATIME_USER_ID'] ?? '';
-$wakatimeApiKey = $_ENV['WAKATIME_API_KEY'] ?? $_SERVER['WAKATIME_API_KEY'] ?? $_SERVER['INPUT_WAKATIME_API_KEY'] ?? '';
-$wakatimeRange = $_ENV['INPUT_WAKATIME_RANGE'] ?? 'all_time';
-$githubToken = $_ENV['GH_TOKEN'] ?? $_SERVER['GH_TOKEN'] ?? $_SERVER['INPUT_GH_TOKEN'] ?? '';
-$tableStyle = $_ENV['TABLE_STYLE'] ?? $_SERVER['TABLE_STYLE'] ?? $_SERVER['INPUT_TABLE_STYLE'] ?? 'default';
-$maxLanguages = $_ENV['MAX_LANGUAGES'] ?? $_SERVER['MAX_LANGUAGES'] ?? $_SERVER['INPUT_MAX_LANGUAGES'] ?? '5';
-$wakatimeTimeRange = $_ENV['WAKATIME_TIME_RANGE'] ?? $_SERVER['WAKATIME_TIME_RANGE'] ?? $_SERVER['INPUT_WAKATIME_TIME_RANGE'] ?? 'all_time';
-
-if ($maxLanguages) {
-    if(!is_numeric($maxLanguages)) {
-        $maxLanguages = 5;
-    }
-    $maxLanguages = (int)$maxLanguages;
-    if ($maxLanguages < 5) {
-        $maxLanguages = 5;
-    }
-}
-
-if (!in_array(strtolower($tableStyle), $allowedTableStyle)) {
-    $tableStyle = 'default';
-}
-
-
-if (!$wakatimeUserId || !$wakatimeApiKey) {
-    echo("Wakatime infos not provided");
-    exit(1);
-}
-if (!$githubToken) {
-    echo("GitHub token not provided");
-    exit(1);
-}
-
-$repositoryInfo = $_SERVER['GITHUB_REPOSITORY'] ?? $_ENV['GH_REPOSITORY'] ?? $_SERVER['INPUT_GITHUB_REPOSITORY'] ?? '';
-
-if (!$repositoryInfo) {
-    echo("Repository info not provided");
-    exit(1);
-}
-
-list($githubUsername, $githubRepositoryName) = explode('/', $repositoryInfo);
-
-if (!$githubUsername || !$githubRepositoryName) {
-    echo("Repository info is incomplete");
-    exit(1);
-}
-
-if ($githubUsername !== $githubRepositoryName) {
-    echo("Repository is not the special one required. Must have <username>/<username>");
-    exit(1);
-}
-
-
-$wakatimeDataFetcher = new WakatimeDataFetcher($wakatimeUserId, $wakatimeApiKey);
 try {
+    $githubToken = $_SERVER['INPUT_GH_TOKEN'] ?? $_ENV['GH_TOKEN'];
+    $wakatimeUserId = $_SERVER['INPUT_WAKATIME_USER_ID'] ?? $_ENV['WAKATIME_USER_ID'];
+    $wakatimeApiKey = $_SERVER['INPUT_WAKATIME_API_KEY'] ?? $_ENV['WAKATIME_API_KEY'];
+    $wakatimeTimeRange = $_SERVER['INPUT_WAKATIME_TIME_RANGE'] ?? $_ENV['WAKATIME_TIME_RANGE'] ?? 'all_time';
+    $githubRepositoryInfo = $_SERVER['GITHUB_REPOSITORY'] ?? $_ENV['GH_REPOSITORY'];
+
+    if (!$githubToken || !$wakatimeUserId || !$wakatimeApiKey || !$githubRepositoryInfo) {
+        throw new Exception("Missing required environment variables.");
+    }
+
+    list($githubUsername, $githubRepositoryName) = explode('/', $githubRepositoryInfo);
+
+    if (!$githubUsername || !$githubRepositoryName || $githubUsername !== $githubRepositoryName) {
+        throw new Exception("Invalid repository info.");
+    }
+
+    $wakatimeDataFetcher = new WakatimeDataFetcher($wakatimeUserId, $wakatimeApiKey);
     $wakatimeData = $wakatimeDataFetcher->fetchStats($wakatimeTimeRange);
-    $readableRange = $wakatimeDataFetcher->getReadableRange();
 
     if (!$wakatimeData['is_up_to_date']) {
-        exit("Wakatime data is not up to date yet. Please wait a few minutes.");
-    }
-} catch (GuzzleException $e) {
-    echo $e->getMessage()."\n";
-    exit(1);
-}
-
-
-$output = new BufferedOutput();
-
-$categories = [
-    'languages' => 'Programming Languages',
-    'editors' => 'Editors',
-    'operating_systems' => 'Operating Systems',
-];
-
-
-foreach ($categories as $dataKey => $categoryTitle) {
-    $table = new Table($output);
-    $table->setStyle($tableStyle);
-    $stats = $wakatimeData[$dataKey];
-    $table->setHeaderTitle("$readableRange Stats for $categoryTitle");
-    $table->setHeaders([$categoryTitle, 'Total Hours']);
-
-    foreach ($stats as $index => $stat) {
-        if ($dataKey == 'editors' && $stat["name"] == 'Unknown Editor') {
-            continue;
-        }
-
-        $table->addRow([
-            $stat["name"],
-            new TableCell(
-                $stat["text"],
-                ['style' => new TableCellStyle(['align' => $tableStyle == 'compact' ? 'left' : 'center'])]
-            ),
-        ]);
-
-        if ($dataKey == 'languages' && $index === ($maxLanguages - 1)) {
-            break;
-        }
+        throw new Exception("Wakatime data is not up to date yet. Please wait a few minutes.");
     }
 
-    $table->setColumnWidth(0, 25);
-    $table->setColumnWidth(1, 30);
+    $output = new BufferedOutput();
+    $categories = [
+        'languages' => 'Programming Languages',
+        'editors' => 'Editors',
+        'operating_systems' => 'Operating Systems',
+    ];
 
-    $table->render();
-    $output->writeln('');
-    $output->writeln('');
-}
-
-$resultsStats = trim($output->fetch());
-
-
-$statsResult = "
-### Wakatime Stats
-```
-{$resultsStats}
-```";
+    $tableStyle = $_SERVER['INPUT_TABLE_STYLE'] ?? $_ENV['TABLE_STYLE'] ?? 'default';
+    if (!in_array($tableStyle, ["default", "box", "box-double"])) {
+        $tableStyle = 'default';
+    }
 
 
-$githubStatsUpdater = new GitHubStatsUpdater($githubToken);
+    $maxLanguages = (int)$_SERVER['INPUT_MAX_LANGUAGES'] ?? $_ENV['MAX_LANGUAGES'] ?? 5;
+    if (!is_numeric($maxLanguages) || $maxLanguages < 1) {
+        $maxLanguages = 5;
+    }
 
-try {
+    foreach ($categories as $dataKey => $categoryTitle) {
+        $table = new Table($output);
+        $table->setStyle($tableStyle);
+        $stats = $wakatimeData[$dataKey];
+        $table->setHeaderTitle("{$wakatimeDataFetcher->getReadableRange()} Stats for $categoryTitle");
+        $table->setHeaders([$categoryTitle, 'Total Hours']);
+
+        foreach ($stats as $index => $stat) {
+            if ($dataKey == 'editors' && $stat["name"] == 'Unknown Editor') {
+                continue;
+            }
+
+            $table->addRow([
+                $stat["name"],
+                new TableCell(
+                    $stat["text"],
+                    ['style' => new TableCellStyle(['align' => 'center'])]
+                ),
+            ]);
+
+
+            if ($dataKey == 'languages' && $index === ($maxLanguages - 1)) {
+                break;
+            }
+        }
+
+        $table->setColumnWidth(0, 25);
+        $table->setColumnWidth(1, 30);
+
+        $table->render();
+        $output->writeln('');
+        $output->writeln('');
+    }
+
+    $resultsStats = trim($output->fetch());
+
+    $statsResult = "### Wakatime Stats\n```\n$resultsStats\n```";
+
+    $githubStatsUpdater = new GitHubStatsUpdater($githubToken);
     $githubStatsUpdater->updateReadme($githubUsername, $githubRepositoryName, $statsResult);
-} catch (GuzzleException $e) {
+} catch (Exception|GuzzleException $e) {
     echo $e->getMessage()."\n";
     exit(1);
 }
