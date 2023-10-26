@@ -106,7 +106,7 @@ To set up and use this GitHub Actions workflow in your repository, follow these 
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - uses: claserre9/wakatime-stats@v1.1
+      - uses: claserre9/wakatime-stats@vmaster
         with:
           WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
           WAKATIME_USER_ID: ${{ secrets.WAKATIME_USER_ID }}
