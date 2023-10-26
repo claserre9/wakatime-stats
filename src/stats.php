@@ -15,7 +15,7 @@ $dotenv->safeLoad();
 
 try {
     $githubToken = $_SERVER['INPUT_GH_TOKEN'] ?? $_ENV['GH_TOKEN'];
-    $wakatimeUserId =  $_SERVER['INPUT_WAKATIME_USER_ID'] ??  $_ENV['WAKATIME_USER_ID'];
+    $wakatimeUserId = $_SERVER['INPUT_WAKATIME_USER_ID'] ?? $_ENV['WAKATIME_USER_ID'];
     $wakatimeApiKey = $_SERVER['INPUT_WAKATIME_API_KEY'] ?? $_ENV['WAKATIME_API_KEY'];
     $wakatimeTimeRange = $_SERVER['INPUT_WAKATIME_TIME_RANGE'] ?? $_ENV['WAKATIME_TIME_RANGE'] ?? 'all_time';
     $githubRepositoryInfo = $_SERVER['GITHUB_REPOSITORY'] ?? $_ENV['GH_REPOSITORY'];
@@ -45,11 +45,15 @@ try {
     ];
 
     $tableStyle = $_SERVER['INPUT_TABLE_STYLE'] ?? $_ENV['TABLE_STYLE'] ?? 'default';
-    if(!in_array($tableStyle, ["default", "box", "box-double"])) $tableStyle = 'default';
+    if (!in_array($tableStyle, ["default", "box", "box-double"])) {
+        $tableStyle = 'default';
+    }
 
 
-    $maxLanguages = (int) $_SERVER['INPUT_MAX_LANGUAGES'] ?? $_ENV['MAX_LANGUAGES'] ?? 5;
-    if(!is_numeric($maxLanguages) || $maxLanguages < 1) $maxLanguages = 5;
+    $maxLanguages = (int)$_SERVER['INPUT_MAX_LANGUAGES'] ?? $_ENV['MAX_LANGUAGES'] ?? 5;
+    if (!is_numeric($maxLanguages) || $maxLanguages < 1) {
+        $maxLanguages = 5;
+    }
 
     foreach ($categories as $dataKey => $categoryTitle) {
         $table = new Table($output);
@@ -91,7 +95,7 @@ try {
 
     $githubStatsUpdater = new GitHubStatsUpdater($githubToken);
     $githubStatsUpdater->updateReadme($githubUsername, $githubRepositoryName, $statsResult);
-} catch (Exception | GuzzleException $e) {
-    echo $e->getMessage() . "\n";
+} catch (Exception|GuzzleException $e) {
+    echo $e->getMessage()."\n";
     exit(1);
 }
