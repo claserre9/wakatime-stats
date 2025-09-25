@@ -1,4 +1,8 @@
+# Ignore local environment files
+.env
+.env.local
+.phpunit.cache/
+.phpstan/
 /vendor/
 /.idea/
-/.vscode/
-.env
+.DS_Store

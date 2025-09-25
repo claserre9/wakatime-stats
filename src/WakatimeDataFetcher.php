@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Claserre9\WakatimeStats;
 
 use GuzzleHttp\Client;
@@ -9,7 +11,7 @@ class WakatimeDataFetcher
 {
     private Client $client;
 
-    private string $range;
+    protected string $range;
 
     private static array $statsRange = ["last_7_days",  "last_30_days", "last_6_months", "last_year", "all_time"];
 
@@ -17,35 +19,42 @@ class WakatimeDataFetcher
     {
         $this->client = new Client([
             'base_uri' => 'https://wakatime.com/api/v1/users/' . $wakatimeUserId . '/',
-            'headers' => ['Authorization' => 'Basic ' . base64_encode($wakatimeApiKey)]
+            'headers' => ['Authorization' => 'Basic ' . base64_encode($wakatimeApiKey)],
         ]);
     }
 
-    public function getRange(): string
-    {
-        return $this->range;
-    }
+	private function validateStatsRange($range)
+	{
+		if(!in_array($range, self::$statsRange)) {
+			return 'all_time';
+		}
 
-    public function setRange(string $range): void{
-        $this->range = $range;
-    }
+		return $range;
+	}
 
     /**
      * @throws GuzzleException
      */
     public function fetchStats($range = 'all_time')
     {
-        if(!in_array($range, self::$statsRange)) {
-            $range = 'all_time';
-        }
+	    $range = $this->validateStatsRange($range);
 
-        $response = $this->client->get("stats/{$range}");
+        $response = $this->client->get("stats/$range");
         $wakatimeData = json_decode($response->getBody()->getContents(), true);
-        $this->setRange($range);
         return $wakatimeData['data'];
     }
 
-    public function getReadableRange(): string{
+	public function fetchProjectStats($range = 'all_time')
+	{
+		$range = $this->validateStatsRange($range);
+	}
+	
+	public function fetchCommitStats($range = 'all_time')
+	{
+		$range = $this->validateStatsRange($range);
+	}
+
+    public function  getReadableRange(): string{
         switch ($this->range) {
             case 'last_7_days':
                 return 'Last 7 Days';

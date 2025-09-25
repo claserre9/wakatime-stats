@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Claserre9\WakatimeStats;
 
 use GuzzleHttp\Client;
