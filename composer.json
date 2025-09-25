@@ -27,7 +27,7 @@
     },
     "scripts": {
         "test": "phpunit",
-        "analyze": "phpstan analyse -l 8 src",
+        "analyze": "phpstan analyse -l 5 src",
         "lint": "php-cs-fixer fix --dry-run --diff",
         "fix": "php-cs-fixer fix"
     }

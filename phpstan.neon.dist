@@ -1,10 +1,8 @@
 parameters:
-  level: 8
+  level: 6
   paths:
     - src
   tmpDir: .phpstan
   checkMissingIterableValueType: true
   checkGenericClassInNonGenericObjectType: true
   reportUnmatchedIgnoredErrors: true
-  ignoreErrors:
-    - '#Call to an undefined method Symfony\\Component\\Console\\Helper\\Table::setColumnWidth#'

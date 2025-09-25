@@ -48,7 +48,7 @@ class WakatimeStatsDataProcessor
             $tableStyle = 'default';
         }
 
-        $maxLanguages = (int)$_SERVER['INPUT_MAX_LANGUAGES'] ?? $_ENV['MAX_LANGUAGES'] ?? 5;
+        $maxLanguages = $_SERVER['INPUT_MAX_LANGUAGES'] ?? $_ENV['MAX_LANGUAGES'] ?? 5;
         if (!is_numeric($maxLanguages) || $maxLanguages < 1) {
             $maxLanguages = 5;
         }

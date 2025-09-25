@@ -12,7 +12,7 @@ class GitHubStatsUpdater
     private Client $githubClient;
     private string $githubToken;
 
-    public function __construct($githubToken)
+    public function __construct(string $githubToken)
     {
         $this->githubClient = new Client();
         $this->githubToken  = $githubToken;
