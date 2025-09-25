@@ -13,48 +13,49 @@ class WakatimeDataFetcher
 
     protected string $range;
 
-    private static array $statsRange = ["last_7_days",  "last_30_days", "last_6_months", "last_year", "all_time"];
+    private static array $statsRange = ['last_7_days',  'last_30_days', 'last_6_months', 'last_year', 'all_time'];
 
     public function __construct($wakatimeUserId, $wakatimeApiKey)
     {
         $this->client = new Client([
             'base_uri' => 'https://wakatime.com/api/v1/users/' . $wakatimeUserId . '/',
-            'headers' => ['Authorization' => 'Basic ' . base64_encode($wakatimeApiKey)],
+            'headers'  => ['Authorization' => 'Basic ' . base64_encode($wakatimeApiKey)],
         ]);
     }
 
-	private function validateStatsRange($range)
-	{
-		if(!in_array($range, self::$statsRange)) {
-			return 'all_time';
-		}
+    private function validateStatsRange($range)
+    {
+        if (!in_array($range, self::$statsRange, true)) {
+            return 'all_time';
+        }
 
-		return $range;
-	}
+        return $range;
+    }
 
     /**
      * @throws GuzzleException
      */
     public function fetchStats($range = 'all_time')
     {
-	    $range = $this->validateStatsRange($range);
+        $range = $this->validateStatsRange($range);
 
-        $response = $this->client->get("stats/$range");
+        $response     = $this->client->get("stats/$range");
         $wakatimeData = json_decode($response->getBody()->getContents(), true);
         return $wakatimeData['data'];
     }
 
-	public function fetchProjectStats($range = 'all_time')
-	{
-		$range = $this->validateStatsRange($range);
-	}
-	
-	public function fetchCommitStats($range = 'all_time')
-	{
-		$range = $this->validateStatsRange($range);
-	}
+    public function fetchProjectStats($range = 'all_time')
+    {
+        $range = $this->validateStatsRange($range);
+    }
 
-    public function  getReadableRange(): string{
+    public function fetchCommitStats($range = 'all_time')
+    {
+        $range = $this->validateStatsRange($range);
+    }
+
+    public function getReadableRange(): string
+    {
         switch ($this->range) {
             case 'last_7_days':
                 return 'Last 7 Days';

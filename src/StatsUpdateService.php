@@ -25,10 +25,10 @@ class StatsUpdateService
     public function run(): void
     {
         $fetcher = new WakatimeDataFetcher($this->config->getWakatimeUserId(), $this->config->getWakatimeApiKey());
-        $data = $fetcher->fetchStats($this->config->getTimeRange());
+        $data    = $fetcher->fetchStats($this->config->getTimeRange());
 
         $processor = new WakatimeStatsDataProcessor($data);
-        $stats = $processor->generateStats();
+        $stats     = $processor->generateStats();
 
         $updater = new GitHubStatsUpdater($this->config->getGithubToken());
         $updater->updateReadme($this->config->getRepoOwner(), $this->config->getRepoName(), $stats);
